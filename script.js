@@ -10,7 +10,7 @@ let playerCellSize = 5;
 let score = 0;
 
 playerRightVelocity = 0;
-playerDownVelocity = 1;
+playerDownVelocity = 0;
 
 let debug = false;
 let gridLines = false;
@@ -289,18 +289,13 @@ function increasePlayerSize() {
     playerCellSize += 5;
 }
 
-let frame = 0;
 function gameLoop() {
 
     if (!paused) {
-        //update the grid every 2 seconds
-        //if (frame % 20 === 0) {
         updateGrid();
-        //}
         detectCollisions();
 
         //spawnCells();
-        frame++;
         drawGrid();
         updateKeys();
         updatePlayer();
