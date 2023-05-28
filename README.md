@@ -12,8 +12,10 @@ Move your red dot around and eat the blue dots to grow in size.
 
 | Action | Key |
 | --- | --- |
-| Move | Arrow keys |
+| Move | Arrow keys or ijkl |
 | Reset | Enter |
 | Pause | P |
 | Increase Size | Space | 
-
+| Spawn something | y |
+| Debug info | d |
+| Draw graph | g |
