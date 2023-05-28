@@ -9,6 +9,9 @@ let cellSize = 5;
 let playerCellSize = 5;
 let score = 0;
 
+playerRightVelocity = 0;
+playerDownVelocity = 1;
+
 let debug = false;
 let gridLines = false;
 
@@ -134,6 +137,11 @@ function updateGrid() {
     grid = newGrid;
 }
 
+function updatePlayer() {
+    player.col += playerRightVelocity;
+    player.row += playerDownVelocity;
+}
+
 function countNeighbors(row, col) {
     let count = 0;
     for (let i = -1; i <= 1; i++) {
@@ -150,17 +158,33 @@ function countNeighbors(row, col) {
 
 
 
-document.addEventListener('keydown', function (event) {
-    if (event.key === 'ArrowUp'  || event.key === 'i') {
-        player.row--;
-    } else if (event.key === 'ArrowDown ' || event.key === 'k') {
-        player.row++;
-    } else if (event.key === 'ArrowLeft' || event.key === 'j') {
-        player.col--;
-    } else if (event.key === 'ArrowRight' || event.key === 'l') {
-        player.col++;
-    }
+let keys = {};
+
+document.addEventListener('keydown', function(event) {
+  keys[event.code] = true;
 });
+
+document.addEventListener('keyup', function(event) {
+  keys[event.code] = false;
+});
+
+function updateKeys() {
+  if (keys['ArrowUp'] || keys['KeyI'] || keys['ArrowDown'] || keys['KeyK']) {
+    if (keys['ArrowUp'] || keys['KeyI']) { // up arrow or 'i' key
+      playerDownVelocity -= .05;
+    } if (keys['ArrowDown'] || keys['KeyK']) { // down arrow or 'k' key
+      playerDownVelocity += .05;
+    }
+  }else playerDownVelocity *= .9;
+ if (keys['ArrowLeft'] || keys['KeyJ'] || keys['ArrowRight'] || keys['KeyL']) {
+     if (keys['ArrowLeft'] || keys['KeyJ']) { // left arrow or 'j' key
+       playerRightVelocity -= .05;
+     }
+     if (keys['ArrowRight'] || keys['KeyL']) { // right arrow or 'l' key
+       playerRightVelocity += .05;
+     }
+ }else playerRightVelocity *= .9;
+}
 
 // turn on and off debug mode
 document.addEventListener('keydown', function (event) {
@@ -278,6 +302,8 @@ function gameLoop() {
         //spawnCells();
         frame++;
         drawGrid();
+        updateKeys();
+        updatePlayer();
         drawPlayer();
         drawScore();
         if (gridLines) drawGridLines();
