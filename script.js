@@ -21,6 +21,7 @@ const numCols = canvas.width / cellSize;
 let paused = false;
 
 let grid = createGrid(numRows, numCols);
+let lastGrid = copyGrid(grid);
 
 function createGrid(numRows, numCols) {
     let grid = new Array(numRows);
@@ -114,7 +115,48 @@ function drawDebug() {
 
 }
 
+function copyGrid(grid) {
+    let newGrid = [];
+    for (let row = 0; row < numRows; row++) {
+        newGrid.push([]);
+        for (let col = 0; col < numCols; col++) {
+            newGrid[row].push(grid[row][col]);
+        }
+    }
+    return newGrid;
+}
+
+function compareGrids(grid1, grid2) {
+    for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numCols; col++) {
+            if (grid1[row][col] !== grid2[row][col]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
+function randomProperty(obj) {
+    let keys = Object.keys(obj);
+    return obj[keys[keys.length * Math.random() << 0]];
+};
+
+function spawnStillLife() {
+
+    let stillLife = randomProperty(stillLifesAndOscillators);
+    let startX = Math.floor(Math.random() * (numCols - stillLife[0].length));
+    let startY = Math.floor(Math.random() * (numRows - stillLife.length));
+    for (let i = 0; i < stillLife.length; i++) {
+        for (let j = 0; j < stillLife[0].length; j++) {
+            grid[startY + i][startX + j] = stillLife[i][j];
+        }
+    }
+}
+
 function updateGrid() {
+    lastGrid = copyGrid(grid);
     let newGrid = createGrid(numRows, numCols);
     for (let i = 0; i < numRows; i++) {
         for (let j = 0; j < numCols; j++) {
@@ -135,6 +177,10 @@ function updateGrid() {
         }
     }
     grid = newGrid;
+
+    if (compareGrids(grid, lastGrid)) {
+        spawn10X10Cells();
+    }
 }
 
 function updatePlayer() {
@@ -160,30 +206,30 @@ function countNeighbors(row, col) {
 
 let keys = {};
 
-document.addEventListener('keydown', function(event) {
-  keys[event.code] = true;
+document.addEventListener('keydown', function (event) {
+    keys[event.code] = true;
 });
 
-document.addEventListener('keyup', function(event) {
-  keys[event.code] = false;
+document.addEventListener('keyup', function (event) {
+    keys[event.code] = false;
 });
 
 function updateKeys() {
-  if (keys['ArrowUp'] || keys['KeyI'] || keys['ArrowDown'] || keys['KeyK']) {
-    if (keys['ArrowUp'] || keys['KeyI']) { // up arrow or 'i' key
-      playerDownVelocity -= .05;
-    } if (keys['ArrowDown'] || keys['KeyK']) { // down arrow or 'k' key
-      playerDownVelocity += .05;
-    }
-  }else playerDownVelocity *= .9;
- if (keys['ArrowLeft'] || keys['KeyJ'] || keys['ArrowRight'] || keys['KeyL']) {
-     if (keys['ArrowLeft'] || keys['KeyJ']) { // left arrow or 'j' key
-       playerRightVelocity -= .05;
-     }
-     if (keys['ArrowRight'] || keys['KeyL']) { // right arrow or 'l' key
-       playerRightVelocity += .05;
-     }
- }else playerRightVelocity *= .9;
+    if (keys['ArrowUp'] || keys['KeyI'] || keys['ArrowDown'] || keys['KeyK']) {
+        if (keys['ArrowUp'] || keys['KeyI']) { // up arrow or 'i' key
+            playerDownVelocity -= .05;
+        } if (keys['ArrowDown'] || keys['KeyK']) { // down arrow or 'k' key
+            playerDownVelocity += .05;
+        }
+    } else playerDownVelocity *= .9;
+    if (keys['ArrowLeft'] || keys['KeyJ'] || keys['ArrowRight'] || keys['KeyL']) {
+        if (keys['ArrowLeft'] || keys['KeyJ']) { // left arrow or 'j' key
+            playerRightVelocity -= .05;
+        }
+        if (keys['ArrowRight'] || keys['KeyL']) { // right arrow or 'l' key
+            playerRightVelocity += .05;
+        }
+    } else playerRightVelocity *= .9;
 }
 
 // turn on and off debug mode
@@ -255,6 +301,39 @@ function spawnCells() {
     }
 }
 
+function spawn10X10Cells() {
+
+    let row = Math.floor(Math.random() * numRows);
+    let col = Math.floor(Math.random() * numCols);
+
+    if (row + 10 >= numRows) {
+        row = numRows - 10;
+    }
+    if (col + 10 >= numCols) {
+        col = numCols - 10;
+    }
+
+    for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+            grid[row + i][col + j] = Math.random() > .5 ? 1 : 0;
+        }
+    }
+}
+
+//If q is pressed, spawn 10x10 random cells
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'q') {
+        spawn10X10Cells();
+    }
+});
+
+//If y is pressed, spawn still life
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'y') {
+        spawnStillLife();
+    }
+});
+
 //If enter is pressed, reset the game
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
@@ -285,9 +364,23 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
+function countCells() {
+    let count = 0;
+    for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numCols; col++) {
+            if (grid[row][col] === 1) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
 function increasePlayerSize() {
     playerCellSize += 5;
 }
+
+
 
 function gameLoop() {
 
@@ -301,11 +394,20 @@ function gameLoop() {
         updatePlayer();
         drawPlayer();
         drawScore();
+        if (countCells() < 20) {
+            spawn10X10Cells();
+        }
         if (gridLines) drawGridLines();
         if (debug) drawDebug();
 
     }
     requestAnimationFrame(gameLoop);
 }
+
+setInterval(function () {
+    if (!paused) {
+        spawnStillLife();
+    }
+}, 1000);
 
 gameLoop();
