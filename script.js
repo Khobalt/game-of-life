@@ -1,23 +1,25 @@
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
 
-//resize canvas
 canvas.width = 600;
 canvas.height = 600;
 
-let cellSize = 5;
-let playerCellSize = 5;
 let score = 0;
-
-playerRightVelocity = 0;
-playerDownVelocity = 0;
-
-let debug = false;
-let gridLines = false;
+let cellSize = 5;
 
 const numRows = canvas.height / cellSize;
 const numCols = canvas.width / cellSize;
 
+let playerCellSize = 5;
+let player = {
+    row: 100,
+    col: 100
+};
+let playerRightVelocity = 0;
+let playerDownVelocity = 0;
+
+let debug = false;
+let gridLines = false;
 let paused = false;
 
 let grid = createGrid(numRows, numCols);
@@ -33,16 +35,6 @@ function createGrid(numRows, numCols) {
     }
     return grid;
 }
-
-let player = {
-    row: 100,
-    col: 100
-};
-
-//player.col = Math.floor(Math.random() * numCols);
-//player.row = Math.floor(Math.random() * numRows);
-
-//Draw
 
 function copyGrid(grid) {
     let newGrid = [];
@@ -66,14 +58,12 @@ function compareGrids(grid1, grid2) {
     return true;
 }
 
-
 function randomProperty(obj) {
     let keys = Object.keys(obj);
     return obj[keys[keys.length * Math.random() << 0]];
 };
 
 function spawnStillLife() {
-
     let stillLife = randomProperty(stillLifesAndOscillators);
     let startX = Math.floor(Math.random() * (numCols - stillLife[0].length));
     let startY = Math.floor(Math.random() * (numRows - stillLife.length));
@@ -106,7 +96,6 @@ function updateGrid() {
         }
     }
     grid = newGrid;
-
     if (compareGrids(grid, lastGrid)) {
         spawn10X10Cells();
     }
@@ -130,8 +119,6 @@ function countNeighbors(row, col) {
     }
     return count;
 }
-
-
 
 let keys = {};
 
@@ -235,12 +222,8 @@ function spawn10X10Cells() {
     let row = Math.floor(Math.random() * numRows);
     let col = Math.floor(Math.random() * numCols);
 
-    if (row + 10 >= numRows) {
-        row = numRows - 10;
-    }
-    if (col + 10 >= numCols) {
-        col = numCols - 10;
-    }
+    if (row + 10 >= numRows) row = numRows - 10;
+    if (col + 10 >= numCols) col = numCols - 10;
 
     for (let i = 0; i < 10; i++) {
         for (let j = 0; j < 10; j++) {
@@ -251,9 +234,7 @@ function spawn10X10Cells() {
 
 //If q is pressed, spawn 10x10 random cells
 document.addEventListener('keydown', function (event) {
-    if (event.key === 'q') {
-        spawn10X10Cells();
-    }
+    if (event.key === 'q') spawn10X10Cells()
 });
 
 //If y is pressed, spawn still life
@@ -309,8 +290,6 @@ function increasePlayerSize() {
     playerCellSize += 5;
 }
 
-
-
 function gameLoop() {
 
     if (!paused) {
@@ -320,18 +299,13 @@ function gameLoop() {
         draw();
         updateKeys();
         updatePlayer();
-        if (countCells() < 20) {
-            spawn10X10Cells();
-        }
-
+        if (countCells() < 20) spawn10X10Cells();
     }
     requestAnimationFrame(gameLoop);
 }
 
 setInterval(function () {
-    if (!paused) {
-        spawnStillLife();
-    }
+    if (!paused) spawnStillLife();
 }, 1000);
 
 gameLoop();
