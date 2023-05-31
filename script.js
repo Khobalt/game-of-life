@@ -300,7 +300,7 @@ let objective2Once = false;
 let endCreditsOnce = false;
 
 let introWav = new Audio('intro.wav');
-let objectiveWav = new Audio('objective.wav');
+let dropInWav = new Audio('dropIn.wav');
 let collideWavs = [
     new Audio('collide1.wav'),
     new Audio('collide2.wav'),
@@ -314,6 +314,7 @@ let levelUpWavs = [
     new Audio('levelup4.wav'),
 ]
 function intro() {
+    //gameState = 2; //skip intro or select scene by setting this
     //Display intro text "Game of Life" centered on screen
     drawGrid();
     ctx.fillStyle = 'white';
@@ -338,12 +339,14 @@ function intro() {
                 introWav.play();
             });
         });
-        //play intro wav
-        introWav.play();
 
+        introOnce = true;
+        objective1Once = false;
+        objective2Once = false;
+        level1Once = false;
+        level2Once = false;
+        endCreditsOnce = false;
     }
-    introOnce = true;
-    endCreditsOnce = false;
 }
 
 function objective1() {
@@ -370,15 +373,28 @@ function objective1() {
                 );
             }
         });
-        objectiveWav.play();
+        
+        //Play a levelup wav
+        levelUpWavs[Math.floor(Math.random() * levelUpWavs.length)].play();
+
         setTimeout(function () { gameState = 2; }, 3000);
         objective1Once = true;
         introOnce = false;
     }
 }
 
-
+let level1Once = false;
 function level1() {
+    if (!level1Once) {
+        dropInWav.play();
+        player = {
+            row: 1,
+            col: numCols / 2,
+        }
+        playerDownVelocity = 6.5;
+        playerRightVelocity = 0;
+        level1Once = true;
+    }
     if (!paused) {
         updateGrid();
         detectCollisions();
@@ -406,7 +422,7 @@ function objective2() {
     ctx.textAlign = 'center';
     ctx.fillText('Level 2', canvas.width / 2, canvas.height / 2);
     ctx.font = '24px sans-serif';
-    ctx.fillText('Objective: Score 400', canvas.width / 2, canvas.height / 2 + 50);
+    ctx.fillText('Objective: Eat 400 cells', canvas.width / 2, canvas.height / 2 + 50);
 
     if (!objective2Once) {
         //If enter is pressed, start the game
@@ -421,15 +437,24 @@ function objective2() {
                 );
             }
         });
-        objectiveWav.play();
+        //objectiveWav.play();
         setTimeout(function () { gameState = 4; }, 3000);
         objective2Once = true;
         objective1Once = false;
     }
 }
-
+let level2Once = false;
 function level2() {
-
+    if (!level2Once) {
+        dropInWav.play();
+        player = {
+            row: 1,
+            col: numCols / 2,
+        }
+        playerDownVelocity = 6.5;
+        playerRightVelocity = 0;
+        level2Once = true;
+    }
     if (!paused) {
         updateGrid();
         detectCollisions();
@@ -477,7 +502,7 @@ function endCredits() {
         });
         playerCellSize = 10;
         endCreditsOnce = true;
-        objective2Once = false;
+        introOnce = false;
     }
 }
 
