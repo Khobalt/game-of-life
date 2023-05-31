@@ -10,7 +10,7 @@ let cellSize = 5;
 const numRows = canvas.height / cellSize;
 const numCols = canvas.width / cellSize;
 
-let playerCellSize = 5;
+let playerCellSize = 10;
 let player = {
     row: 100,
     col: 100
@@ -71,6 +71,12 @@ function spawnStillLife() {
         for (let j = 0; j < stillLife[0].length; j++) {
             grid[startY + i][startX + j] = stillLife[i][j];
         }
+    }
+}
+
+function clearGrid() {
+    for (let i = 0; i < numRows; i++) {
+        grid[i].fill(0);
     }
 }
 
@@ -244,17 +250,6 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-//If enter is pressed, reset the game
-document.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
-        score = 0;
-        grid = createGrid(numRows, numCols);
-        player.row = Math.floor(numRows / 2);
-        player.col = Math.floor(numCols / 2);
-        playerCellSize = cellSize;
-
-    }
-});
 
 //If spacebar is pressed, increase player size
 document.addEventListener('keydown', function (event) {
@@ -290,7 +285,119 @@ function increasePlayerSize() {
     playerCellSize += 5;
 }
 
-function gameLoop() {
+function clearScore() {
+    score = 0;
+}
+
+
+let gameState = 0;
+let introOnce = false;
+let objective1Once = false;
+let objective2Once = false;
+let endCreditsOnce = false;
+function intro() {
+    //Display intro text "Game of Life" centered on screen
+    drawGrid();
+    ctx.fillStyle = 'white';
+    ctx.font = '48px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game of Life', canvas.width / 2, canvas.height / 2);
+    ctx.font = '24px sans-serif';
+    ctx.fillText('Press Enter to start', canvas.width / 2, canvas.height / 2 + 50);
+
+    updateGrid();
+    if (!introOnce) {
+        //If enter is pressed, start the game
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                gameState = 1;
+            }
+        }
+        );
+    }
+    introOnce = true;
+    endCreditsOnce = false;
+}
+
+function objective1() {
+    //Clear the screen
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = 'white';
+    ctx.font = '48px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Level 1', canvas.width / 2, canvas.height / 2);
+    ctx.font = '24px sans-serif';
+    ctx.fillText('Objective: Eat 250 cells', canvas.width / 2, canvas.height / 2 + 50);
+
+    if (!objective1Once) {
+        //If enter is pressed, start the game
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                gameState = 2;
+                document.removeEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') {
+                        gameState = 2;
+                    }
+                }
+                );
+            }
+        });
+        setTimeout(function () { gameState = 2; }, 3000);
+        objective1Once = true;
+        introOnce = false;
+    }
+}
+
+
+function level1() {
+    if (!paused) {
+        updateGrid();
+        detectCollisions();
+
+        draw();
+        updateKeys();
+        updatePlayer();
+        if (countCells() < 20) spawn10X10Cells();
+    }
+    if (score >= 250) {
+        gameState = 3;
+        clearScore();
+    }
+}
+
+function objective2() {
+    //Clear the screen
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //Congratulate the player
+    ctx.fillStyle = 'white';
+    ctx.font = '48px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Level 2', canvas.width / 2, canvas.height / 2);
+    ctx.font = '24px sans-serif';
+    ctx.fillText('Objective: Score 400', canvas.width / 2, canvas.height / 2 + 50);
+
+    if (!objective2Once) {
+        //If enter is pressed, start the game
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                gameState = 4;
+                document.removeEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') {
+                        gameState = 4;
+                    }
+                }
+                );
+            }
+        });
+        setTimeout(function () { gameState = 4; }, 3000);
+        objective2Once = true;
+        objective1Once = false;
+    }
+}
+
+function level2() {
 
     if (!paused) {
         updateGrid();
@@ -301,6 +408,65 @@ function gameLoop() {
         updatePlayer();
         if (countCells() < 20) spawn10X10Cells();
     }
+
+    if (score >= 400) {
+        gameState = 5;
+        clearScore();
+    }
+
+}
+
+function endCredits() {
+    //Clear the screen
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //Congratulate the player then clear the screen
+    ctx.fillStyle = 'white';
+    ctx.font = '48px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Congratulations!', canvas.width / 2, canvas.height / 2);
+    ctx.font = '24px sans-serif';
+    ctx.fillText('You have completed the game', canvas.width / 2, canvas.height / 2 + 50);
+    ctx.fillText('Press Enter to play again', canvas.width / 2, canvas.height / 2 + 100);
+
+    if (!endCreditsOnce) {
+        //If enter is pressed, start the game
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                gameState = 0;
+                document.removeEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') {
+                        gameState = 0;
+                    }
+                });
+            }
+        });
+        playerCellSize = 10;
+        endCreditsOnce = true;
+        objective2Once = false;
+    }
+}
+
+//If n is pressed, go to the next scene
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'n' ) {
+        gameState = (gameState + 1) % sceneArray.length;
+    }
+});
+
+
+let sceneArray = [
+    intro,
+    objective1,
+    level1,
+    objective2,
+    level2,
+    endCredits
+];
+
+clearGrid();
+function gameLoop() {
+    sceneArray[gameState]();
     requestAnimationFrame(gameLoop);
 }
 

@@ -34,6 +34,7 @@ function drawPlayer() {
 function drawScore() {
     ctx.font = '16px Arial';
     ctx.fillStyle = 'white';
+    ctx.textAlign = 'left';
     ctx.fillText('Score: ' + score, 8, 20);
 }
 
