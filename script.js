@@ -315,17 +315,8 @@ let levelUpWavs = [
 ]
 function intro() {
     //gameState = 2; //skip intro or select scene by setting this
-    //Display intro text "Game of Life" centered on screen
-    drawGrid();
-    ctx.fillStyle = 'white';
-    ctx.font = '48px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Game of Life', canvas.width / 2, canvas.height / 2);
-    ctx.font = '24px sans-serif';
-    ctx.fillText('Press Enter to start', canvas.width / 2, canvas.height / 2 + 50);
-
-    updateGrid();
     if (!introOnce) {
+        clearGrid();
         //If enter is pressed, start the game
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
@@ -339,7 +330,7 @@ function intro() {
                 introWav.play();
             });
         });
-
+    
         introOnce = true;
         objective1Once = false;
         objective2Once = false;
@@ -347,6 +338,16 @@ function intro() {
         level2Once = false;
         endCreditsOnce = false;
     }
+    //Display intro text "Game of Life" centered on screen
+    drawGrid();
+    ctx.fillStyle = 'white';
+    ctx.font = '48px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game of Life', canvas.width / 2, canvas.height / 2);
+    ctx.font = '24px sans-serif';
+    ctx.fillText('Press Enter to start', canvas.width / 2, canvas.height / 2 + 50);
+
+    updateGrid();
 }
 
 function objective1() {
@@ -373,7 +374,7 @@ function objective1() {
                 );
             }
         });
-        
+
         //Play a levelup wav
         levelUpWavs[Math.floor(Math.random() * levelUpWavs.length)].play();
 
@@ -386,6 +387,7 @@ function objective1() {
 let level1Once = false;
 function level1() {
     if (!level1Once) {
+        clearGrid();
         dropInWav.play();
         player = {
             row: 1,
@@ -446,6 +448,7 @@ function objective2() {
 let level2Once = false;
 function level2() {
     if (!level2Once) {
+        clearGrid();
         dropInWav.play();
         player = {
             row: 1,
