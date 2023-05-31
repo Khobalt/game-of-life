@@ -200,6 +200,9 @@ function detectCollisions() {
                     if (score % 100 === 0) {
                         increasePlayerSize();
                     }
+                    //play random collide wav sound
+                    collideWavs[Math.floor(Math.random() * collideWavs.length)].play();
+
                 }
             }
         }
@@ -295,6 +298,21 @@ let introOnce = false;
 let objective1Once = false;
 let objective2Once = false;
 let endCreditsOnce = false;
+
+let introWav = new Audio('intro.wav');
+let objectiveWav = new Audio('objective.wav');
+let collideWavs = [
+    new Audio('collide1.wav'),
+    new Audio('collide2.wav'),
+    new Audio('collide3.wav'),
+    new Audio('collide4.wav'),
+]
+let levelUpWavs = [
+    new Audio('levelup1.wav'),
+    new Audio('levelup2.wav'),
+    new Audio('levelup3.wav'),
+    new Audio('levelup4.wav'),
+]
 function intro() {
     //Display intro text "Game of Life" centered on screen
     drawGrid();
@@ -314,6 +332,15 @@ function intro() {
             }
         }
         );
+        document.addEventListener('mousedown', function (event) {
+            introWav.play();
+            document.removeEventListener('mousedown', function (event) {
+                introWav.play();
+            });
+        });
+        //play intro wav
+        introWav.play();
+
     }
     introOnce = true;
     endCreditsOnce = false;
@@ -343,6 +370,7 @@ function objective1() {
                 );
             }
         });
+        objectiveWav.play();
         setTimeout(function () { gameState = 2; }, 3000);
         objective1Once = true;
         introOnce = false;
@@ -363,6 +391,8 @@ function level1() {
     if (score >= 250) {
         gameState = 3;
         clearScore();
+        //play level up wav
+        levelUpWavs[Math.floor(Math.random() * levelUpWavs.length)].play();
     }
 }
 
@@ -391,6 +421,7 @@ function objective2() {
                 );
             }
         });
+        objectiveWav.play();
         setTimeout(function () { gameState = 4; }, 3000);
         objective2Once = true;
         objective1Once = false;
@@ -412,6 +443,9 @@ function level2() {
     if (score >= 400) {
         gameState = 5;
         clearScore();
+        //play level up wav
+        levelUpWavs[Math.floor(Math.random() * levelUpWavs.length)].play();
+
     }
 
 }
@@ -449,7 +483,7 @@ function endCredits() {
 
 //If n is pressed, go to the next scene
 document.addEventListener('keydown', function (event) {
-    if (event.key === 'n' ) {
+    if (event.key === 'n') {
         gameState = (gameState + 1) % sceneArray.length;
     }
 });
