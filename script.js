@@ -4,6 +4,30 @@ const ctx = canvas.getContext('2d');
 canvas.width = 600;
 canvas.height = 600;
 
+const colors = [
+    'red',
+    'orange',
+    'yellow',
+    'green',
+    'blue',
+    'purple',
+    'pink',
+    'brown',
+    'black',
+    'gray',
+    'white',
+    'cyan',
+    'magenta',
+    'lime',
+    'olive',
+    'maroon',
+    'navy',
+    'teal',
+    'silver',
+    'gold'
+];
+
+
 let score = 0;
 let cellSize = 5;
 
@@ -272,6 +296,56 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
+let cellColorIndex = 0;
+let backgroundColorIndex = 0;
+
+//press c to cycle through colors background and cell colors
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'c') {
+        if (cellColorIndex === colors.length - 1) {
+            cellColorIndex = 0;
+            if (backgroundColorIndex === colors.length - 1) {
+                backgroundColorIndex = 0;
+            }else{
+                backgroundColorIndex++;
+            }
+        } else {
+            cellColorIndex++;
+        }
+        cellColor = colors[cellColorIndex];
+        backgroundColor = colors[backgroundColorIndex];
+        console.log('cellColor:', cellColor);
+        console.log('backgroundColor:', backgroundColor);
+    }
+});
+
+//Press x to cycle backwards through colors
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'x') {
+        if (cellColorIndex === 0) {
+            cellColorIndex = colors.length - 1;
+            if (backgroundColorIndex === 0) {
+                backgroundColorIndex = colors.length - 1;
+            }else{
+                backgroundColorIndex--;
+            }
+        } else {
+            cellColorIndex--;
+        }
+        cellColor = colors[cellColorIndex];
+        backgroundColor = colors[backgroundColorIndex];
+        console.log('cellColor:', cellColor);
+        console.log('backgroundColor:', backgroundColor);
+    }
+});
+
+//Print "Approved" to console
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'a') {
+        console.log('Approved');
+    }
+});
+
 function countCells() {
     let count = 0;
     for (let row = 0; row < numRows; row++) {
@@ -313,6 +387,10 @@ let levelUpWavs = [
     new Audio('levelup3.wav'),
     new Audio('levelup4.wav'),
 ]
+
+let cellColor = 'white';
+let backgroundColor = 'black';
+
 function intro() {
     //gameState = 2; //skip intro or select scene by setting this
     if (!introOnce) {
@@ -337,9 +415,11 @@ function intro() {
         level1Once = false;
         level2Once = false;
         endCreditsOnce = false;
+        cellColor = colors[Math.floor(Math.random() * colors.length)];
+        backgroundColor = colors[Math.floor(Math.random() * colors.length)];
     }
     //Display intro text "Game of Life" centered on screen
-    drawGrid();
+    drawGrid(cellColor, backgroundColor);
     ctx.fillStyle = 'white';
     ctx.font = '48px sans-serif';
     ctx.textAlign = 'center';
@@ -396,12 +476,15 @@ function level1() {
         playerDownVelocity = 6.5;
         playerRightVelocity = 0;
         level1Once = true;
+        cellColor = colors[Math.floor(Math.random() * colors.length)];
+        backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
     }
     if (!paused) {
         updateGrid();
         detectCollisions();
 
-        draw();
+        draw(cellColor, backgroundColor);
         updateKeys();
         updatePlayer();
         if (countCells() < 20) spawn10X10Cells();
@@ -457,12 +540,15 @@ function level2() {
         playerDownVelocity = 6.5;
         playerRightVelocity = 0;
         level2Once = true;
+
+        cellColor = colors[Math.floor(Math.random() * colors.length)];
+        backgroundColor = colors[Math.floor(Math.random() * colors.length)];
     }
     if (!paused) {
         updateGrid();
         detectCollisions();
 
-        draw();
+        draw(cellColor, backgroundColor);
         updateKeys();
         updatePlayer();
         if (countCells() < 20) spawn10X10Cells();

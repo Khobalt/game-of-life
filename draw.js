@@ -1,8 +1,8 @@
 //Draw
 
-function draw() {
+function draw(cellColor = 'white', background = 'black') {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawGrid();
+    drawGrid(cellColor, background);
     drawPlayer();
     drawScore();
     if (debug) {
@@ -13,14 +13,16 @@ function draw() {
     }
 }
 
-function drawGrid() {
-    ctx.fillStyle = 'blue';
+function drawGrid(color = 'white', background = 'black') {
     for (let i = 0; i < numRows; i++) {
         for (let j = 0; j < numCols; j++) {
             if (grid[i][j] === 1) {
+                ctx.fillStyle = color;
                 ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             } else {
-                ctx.clearRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                ctx.fillStyle = background;
+                
+                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             }
         }
     }
